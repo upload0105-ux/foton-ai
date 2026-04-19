@@ -1,7 +1,9 @@
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
+import { useLocation } from "wouter";
 
 export default function PortalSection() {
+  const [, setLocation] = useLocation();
   return (
     <section className="bg-white py-16 md:py-24">
       <div className="container max-w-7xl mx-auto px-4">
@@ -40,7 +42,10 @@ export default function PortalSection() {
                 <span>Relatórios detalhados de vendas</span>
               </li>
             </ul>
-            <Button className="bg-[#7FFF00] text-black hover:bg-[#6FEE00] font-semibold text-lg px-8 py-6 flex items-center gap-2">
+            <Button 
+              onClick={() => setLocation("/dashboard")}
+              className="bg-[#7FFF00] text-black hover:bg-[#6FEE00] font-semibold text-lg px-8 py-6 flex items-center gap-2"
+            >
               Vender Fotos <ArrowRight size={20} />
             </Button>
           </div>
