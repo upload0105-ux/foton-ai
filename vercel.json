@@ -1,1 +1,7 @@
-{"rewrites": [{"source": "/(.*)", "destination": "/index.html"}], "buildCommand": "pnpm install && pnpm run build", "outputDirectory": "dist/public"}
+{
+  "buildCommand": "pnpm install && pnpm run build",
+  "outputDirectory": "dist",
+  "rewrites": [
+    { "source": "/(.*)", "destination": "/index.html" }
+  ]
+}
