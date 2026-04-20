@@ -1,305 +1,215 @@
-import { useState } from "react";
-import { ChevronLeft, Download, Heart, Share2, Filter, X } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import { Search, Sparkles, ShoppingCart, ChevronLeft, Share2, Filter, Info, X } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { useState } from "react";
+import { Link } from "wouter";
+import FaceRecognitionModal from "@/components/FaceRecognitionModal";
 
-// Mock data for photos found
-const mockPhotos = [
-  {
-    id: 1,
-    url: "https://images.unsplash.com/photo-1517836357463-d25ddfcbf042?w=500&h=500&fit=crop",
-    event: "Maratona SP 2026",
-    photographer: "João Silva",
-    price: 49.90,
-    liked: false,
-  },
-  {
-    id: 2,
-    url: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=500&h=500&fit=crop",
-    event: "Maratona SP 2026",
-    photographer: "Maria Santos",
-    price: 39.90,
-    liked: false,
-  },
-  {
-    id: 3,
-    url: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=500&h=500&fit=crop",
-    event: "Maratona SP 2026",
-    photographer: "Carlos Costa",
-    price: 49.90,
-    liked: false,
-  },
-  {
-    id: 4,
-    url: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=500&h=500&fit=crop",
-    event: "Maratona SP 2026",
-    photographer: "Ana Oliveira",
-    price: 59.90,
-    liked: false,
-  },
-  {
-    id: 5,
-    url: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=500&h=500&fit=crop",
-    event: "Maratona SP 2026",
-    photographer: "João Silva",
-    price: 49.90,
-    liked: false,
-  },
-  {
-    id: 6,
-    url: "https://images.unsplash.com/photo-1500295942863-6f3ee5c30496?w=500&h=500&fit=crop",
-    event: "Maratona SP 2026",
-    photographer: "Pedro Alves",
-    price: 44.90,
-    liked: false,
-  },
-  {
-    id: 7,
-    url: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=500&h=500&fit=crop",
-    event: "Maratona SP 2026",
-    photographer: "Lucia Martins",
-    price: 49.90,
-    liked: false,
-  },
-  {
-    id: 8,
-    url: "https://images.unsplash.com/photo-1517836357463-d25ddfcbf042?w=500&h=500&fit=crop",
-    event: "Maratona SP 2026",
-    photographer: "Roberto Santos",
-    price: 39.90,
-    liked: false,
-  },
-];
+const mockPhotos = Array.from({ length: 24 }).map((_, i) => ({
+  id: i + 1,
+  url: `https://images.unsplash.com/photo-${1500000000000 + i * 1000000}?w=600&h=800&fit=crop`,
+  price: "R$ 6,50",
+  photographer: "Foton Studio",
+  resolution: "2000x3000 px"
+}));
 
 export default function Gallery() {
-  const [photos, setPhotos] = useState(mockPhotos);
-  const [selectedPhotos, setSelectedPhotos] = useState<number[]>([]);
-  const [showFilters, setShowFilters] = useState(false);
-  const [sortBy, setSortBy] = useState("recent");
-
-  const togglePhotoSelection = (id: number) => {
-    setSelectedPhotos((prev) =>
-      prev.includes(id) ? prev.filter((p) => p !== id) : [...prev, id]
-    );
-  };
-
-  const toggleLike = (id: number) => {
-    setPhotos((prev) =>
-      prev.map((photo) =>
-        photo.id === id ? { ...photo, liked: !photo.liked } : photo
-      )
-    );
-  };
-
-  const totalPrice = selectedPhotos.reduce(
-    (sum, id) => sum + (photos.find((p) => p.id === id)?.price || 0),
-    0
-  );
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedPhoto, setSelectedPhoto] = useState<any>(null);
 
   return (
-    <div className="min-h-screen flex flex-col bg-gray-50">
+    <div className="min-h-screen flex flex-col bg-white">
       <Header />
-
+      
       <main className="flex-1">
-        {/* Breadcrumb and Title */}
-        <div className="bg-white border-b border-gray-200">
-          <div className="container max-w-7xl mx-auto px-4 py-6">
-            <div className="flex items-center gap-2 mb-4 text-sm text-gray-600">
-              <a href="/" className="hover:text-gray-900 flex items-center gap-1">
-                <ChevronLeft size={16} />
-                Voltar
-              </a>
-            </div>
-            <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-2">
-              Suas Fotos
-            </h1>
-            <p className="text-gray-600">
-              Encontramos {photos.length} fotos suas no evento Maratona SP 2026
-            </p>
-          </div>
-        </div>
-
-        {/* Filters and Sort */}
-        <div className="bg-white border-b border-gray-200 sticky top-16 z-40">
-          <div className="container max-w-7xl mx-auto px-4 py-4">
-            <div className="flex items-center justify-between gap-4">
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={() => setShowFilters(!showFilters)}
-                  className="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition"
-                >
-                  <Filter size={18} />
-                  Filtros
-                </button>
+        {/* Event Header Section */}
+        <section className="bg-gray-50 border-b py-8 md:py-12">
+          <div className="container max-w-7xl mx-auto px-4">
+            <Link href="/events">
+              <div className="mb-6 -ml-4 text-gray-500 hover:text-black flex items-center gap-2 cursor-pointer w-fit">
+                <ChevronLeft size={20} /> Voltar para eventos
               </div>
-
-              <div className="flex items-center gap-2">
-                <label className="text-sm text-gray-600">Ordenar por:</label>
-                <select
-                  value={sortBy}
-                  onChange={(e) => setSortBy(e.target.value)}
-                  className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-[#7FFF00]"
-                >
-                  <option value="recent">Mais Recentes</option>
-                  <option value="price-low">Menor Preço</option>
-                  <option value="price-high">Maior Preço</option>
-                  <option value="popular">Mais Populares</option>
-                </select>
-              </div>
-            </div>
-
-            {/* Filters Panel */}
-            {showFilters && (
-              <div className="mt-4 p-4 bg-gray-50 rounded-lg">
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">
-                      Fotógrafo
-                    </label>
-                    <select className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-[#7FFF00]">
-                      <option>Todos</option>
-                      <option>João Silva</option>
-                      <option>Maria Santos</option>
-                      <option>Carlos Costa</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">
-                      Faixa de Preço
-                    </label>
-                    <select className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-[#7FFF00]">
-                      <option>Todos</option>
-                      <option>Até R$ 40</option>
-                      <option>R$ 40 - R$ 60</option>
-                      <option>Acima de R$ 60</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">
-                      Qualidade
-                    </label>
-                    <select className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-[#7FFF00]">
-                      <option>Todas</option>
-                      <option>Alta Resolução</option>
-                      <option>Editada</option>
-                    </select>
-                  </div>
+            </Link>
+            
+            <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+              <div>
+                <div className="flex items-center gap-3 mb-3">
+                  <span className="bg-[#7FFF00]/20 text-[#7FFF00] text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">
+                    Corrida
+                  </span>
+                  <span className="text-gray-400 text-sm">19 abr 2026 (Dom)</span>
                 </div>
+                <h1 className="text-3xl md:text-5xl font-bold text-gray-900 mb-2">
+                  Maratona SP 2026
+                </h1>
+                <p className="text-gray-600 flex items-center gap-2">
+                  São Paulo, SP • <span className="font-semibold text-black">Foton Studio</span>
+                </p>
               </div>
-            )}
+              
+              <div className="flex items-center gap-3">
+                <Button variant="outline" className="rounded-xl border-gray-200 flex items-center gap-2">
+                  <Share2 size={18} /> Compartilhar
+                </Button>
+                <Button className="bg-black text-white hover:bg-gray-800 rounded-xl flex items-center gap-2 font-bold">
+                  <ShoppingCart size={18} /> Ver Carrinho (0)
+                </Button>
+              </div>
+            </div>
           </div>
-        </div>
+        </section>
 
-        {/* Photos Grid */}
-        <div className="container max-w-7xl mx-auto px-4 py-12">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {photos.map((photo) => (
-              <div
-                key={photo.id}
-                className="group bg-white rounded-lg overflow-hidden shadow-md hover:shadow-lg transition"
-              >
-                {/* Photo Container */}
-                <div className="relative overflow-hidden bg-gray-200 aspect-square">
-                  <img
-                    src={photo.url}
+        {/* AI Search Banner */}
+        <section className="py-8 bg-white">
+          <div className="container max-w-7xl mx-auto px-4">
+            <div className="bg-gradient-to-r from-black to-gray-900 rounded-3xl p-8 md:p-12 relative overflow-hidden shadow-2xl">
+              <div className="absolute top-0 right-0 w-1/2 h-full bg-[#7FFF00]/10 blur-[100px] -z-0"></div>
+              <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-8">
+                <div className="text-center md:text-left">
+                  <div className="flex items-center justify-center md:justify-start gap-2 text-[#7FFF00] font-bold mb-4">
+                    <Sparkles size={24} />
+                    <span className="uppercase tracking-widest text-sm">IA FOTON.AI</span>
+                  </div>
+                  <h2 className="text-2xl md:text-4xl font-bold text-white mb-4">
+                    Encontre suas fotos por reconhecimento facial
+                  </h2>
+                  <p className="text-gray-400 text-lg max-w-xl">
+                    Tire uma selfie ou envie uma foto do seu rosto. Nossa IA vai encontrar todas as suas fotos em segundos.
+                  </p>
+                </div>
+                <Button 
+                  onClick={() => setIsModalOpen(true)}
+                  className="bg-[#7FFF00] hover:bg-[#6FEE00] text-black font-bold text-xl px-12 py-8 rounded-2xl shadow-[0_0_30px_rgba(127,255,0,0.3)] transition-all hover:scale-105"
+                >
+                  Encontrar fotos
+                </Button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Photo Grid Section */}
+        <section className="py-12">
+          <div className="container max-w-7xl mx-auto px-4">
+            <div className="flex items-center justify-between mb-8">
+              <div className="flex items-center gap-4">
+                <h3 className="text-xl font-bold text-gray-900">190 fotos encontradas</h3>
+                <div className="h-4 w-px bg-gray-200"></div>
+                <Button variant="ghost" className="text-gray-500 hover:text-black flex items-center gap-2">
+                  <Filter size={18} /> Filtrar
+                </Button>
+              </div>
+              <div className="text-sm text-gray-400 flex items-center gap-1">
+                <Info size={14} /> Clique na foto para ver detalhes
+              </div>
+            </div>
+
+            {/* Masonry-like Grid */}
+            <div className="columns-1 sm:columns-2 md:columns-3 lg:columns-4 gap-6 space-y-6">
+              {mockPhotos.map((photo) => (
+                <div 
+                  key={photo.id} 
+                  className="relative group break-inside-avoid rounded-2xl overflow-hidden cursor-pointer shadow-sm hover:shadow-2xl transition-all duration-500"
+                  onClick={() => setSelectedPhoto(photo)}
+                >
+                  <img 
+                    src={photo.url} 
                     alt={`Foto ${photo.id}`}
-                    className="w-full h-full object-cover group-hover:scale-105 transition duration-300"
+                    className="w-full h-auto object-cover group-hover:scale-105 transition-transform duration-700"
                   />
-
-                  {/* Overlay Actions */}
-                  <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition flex items-center justify-center gap-3">
-                    <button
-                      onClick={() => toggleLike(photo.id)}
-                      className={`p-2 rounded-full transition ${
-                        photo.liked
-                          ? "bg-red-500 text-white"
-                          : "bg-white/80 text-gray-900 hover:bg-white"
-                      }`}
-                    >
-                      <Heart
-                        size={20}
-                        fill={photo.liked ? "currentColor" : "none"}
-                      />
-                    </button>
-                    <button className="p-2 rounded-full bg-white/80 text-gray-900 hover:bg-white transition">
-                      <Share2 size={20} />
-                    </button>
-                    <button className="p-2 rounded-full bg-white/80 text-gray-900 hover:bg-white transition">
-                      <Download size={20} />
-                    </button>
-                  </div>
-
-                  {/* Selection Checkbox */}
-                  <div className="absolute top-3 left-3">
-                    <input
-                      type="checkbox"
-                      checked={selectedPhotos.includes(photo.id)}
-                      onChange={() => togglePhotoSelection(photo.id)}
-                      className="w-5 h-5 cursor-pointer accent-[#7FFF00]"
-                    />
+                  
+                  {/* Overlay on Hover */}
+                  <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-between p-4">
+                    <div className="flex justify-end">
+                      <Button size="icon" className="bg-white/20 backdrop-blur-md hover:bg-white/40 text-white rounded-full">
+                        <Share2 size={18} />
+                      </Button>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-white font-bold text-lg">{photo.price}</span>
+                      <Button className="bg-[#7FFF00] hover:bg-[#6FEE00] text-black font-bold rounded-xl flex items-center gap-2">
+                        <ShoppingCart size={16} /> Adicionar
+                      </Button>
+                    </div>
                   </div>
                 </div>
-
-                {/* Photo Info */}
-                <div className="p-4">
-                  <p className="text-sm text-gray-600 mb-1">{photo.photographer}</p>
-                  <p className="font-semibold text-gray-900 mb-3">{photo.event}</p>
-                  <div className="flex items-center justify-between">
-                    <span className="text-lg font-bold text-[#7FFF00]">
-                      R$ {photo.price.toFixed(2)}
-                    </span>
-                    <button
-                      onClick={() => togglePhotoSelection(photo.id)}
-                      className={`px-3 py-1 rounded-lg text-sm font-semibold transition ${
-                        selectedPhotos.includes(photo.id)
-                          ? "bg-[#7FFF00] text-black hover:bg-[#6FEE00]"
-                          : "bg-gray-200 text-gray-900 hover:bg-gray-300"
-                      }`}
-                    >
-                      {selectedPhotos.includes(photo.id) ? "✓" : "+"}
-                    </button>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Sticky Cart Summary */}
-        {selectedPhotos.length > 0 && (
-          <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 shadow-lg">
-            <div className="container max-w-7xl mx-auto px-4 py-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-gray-600">
-                    {selectedPhotos.length} foto{selectedPhotos.length !== 1 ? "s" : ""} selecionada{selectedPhotos.length !== 1 ? "s" : ""}
-                  </p>
-                  <p className="text-2xl font-bold text-gray-900">
-                    R$ {totalPrice.toFixed(2)}
-                  </p>
-                </div>
-                <div className="flex items-center gap-3">
-                  <Button
-                    variant="outline"
-                    onClick={() => setSelectedPhotos([])}
-                  >
-                    Limpar
-                  </Button>
-                  <Button className="bg-[#7FFF00] text-black hover:bg-[#6FEE00] font-semibold px-8">
-                    Ir para Checkout
-                  </Button>
-                </div>
-              </div>
+              ))}
+            </div>
+            
+            {/* Load More */}
+            <div className="mt-16 flex justify-center">
+              <Button variant="outline" className="px-12 py-6 rounded-2xl border-gray-200 text-gray-600 font-bold hover:bg-gray-50">
+                Carregar mais fotos
+              </Button>
             </div>
           </div>
-        )}
+        </section>
       </main>
 
-      {/* Add padding to prevent content from hiding behind sticky cart */}
-      {selectedPhotos.length > 0 && <div className="h-24" />}
-
       <Footer />
+
+      {/* Face Recognition Modal */}
+      <FaceRecognitionModal 
+        isOpen={isModalOpen} 
+        onClose={() => setIsModalOpen(false)} 
+      />
+
+      {/* Photo Detail Modal */}
+      {selectedPhoto && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/90 backdrop-blur-sm">
+          <div className="bg-white rounded-3xl max-w-5xl w-full max-h-[90vh] overflow-hidden flex flex-col md:flex-row relative">
+            <Button 
+              onClick={() => setSelectedPhoto(null)}
+              size="icon" 
+              className="absolute top-4 right-4 z-10 bg-black/50 hover:bg-black text-white rounded-full"
+            >
+              <X size={24} />
+            </Button>
+            
+            <div className="flex-1 bg-gray-100 flex items-center justify-center overflow-hidden">
+              <img 
+                src={selectedPhoto.url} 
+                alt="Foto selecionada"
+                className="max-w-full max-h-full object-contain"
+              />
+            </div>
+            
+            <div className="w-full md:w-96 p-8 flex flex-col justify-between">
+              <div>
+                <h3 className="text-2xl font-bold text-gray-900 mb-6">Detalhes da foto</h3>
+                <div className="space-y-4 mb-8">
+                  <div className="flex justify-between text-sm">
+                    <span className="text-gray-500">Código da foto:</span>
+                    <span className="font-semibold">#{selectedPhoto.id}483605</span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-gray-500">Resolução:</span>
+                    <span className="font-semibold">{selectedPhoto.resolution}</span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-gray-500">Fotógrafo:</span>
+                    <span className="font-semibold">{selectedPhoto.photographer}</span>
+                  </div>
+                </div>
+                
+                <div className="text-4xl font-bold text-gray-900 mb-8">
+                  {selectedPhoto.price}
+                </div>
+              </div>
+              
+              <div className="space-y-3">
+                <Button className="w-full h-16 bg-[#7FFF00] hover:bg-[#6FEE00] text-black font-bold text-lg rounded-2xl flex items-center justify-center gap-3">
+                  <ShoppingCart size={20} /> Adicionar ao carrinho
+                </Button>
+                <p className="text-[10px] text-center text-gray-400">
+                  Compra segura e protegida. Download automático após o pagamento.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
