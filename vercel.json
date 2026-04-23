@@ -1,7 +1,10 @@
 {
-  "version": 2,
-  "outputDirectory": "dist",
-  "rewrites": [
-    { "source": "/(.*)", "destination": "/index.html" }
-  ]
+  "buildCommand": "pnpm install && pnpm build",
+  "installCommand": "pnpm install",
+  "framework": "express",
+  "functions": {
+    "server/index.ts": {
+      "runtime": "nodejs20.x"
+    }
+  }
 }
