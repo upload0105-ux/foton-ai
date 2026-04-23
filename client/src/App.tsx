@@ -5,6 +5,7 @@ import { Route, Switch } from "wouter";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import { AuthProvider } from "./contexts/AuthContext";
+import { ProtectedRoute } from "./components/ProtectedRoute";
 import Home from "./pages/Home";
 import Gallery from "./pages/Gallery";
 import Dashboard from "./pages/Dashboard";
@@ -16,12 +17,20 @@ import Signup from "./pages/Signup";
 function Router() {
   return (
     <Switch>
-      <Route path={"//"} component={Home} />
+      <Route path={"/"} component={Home} />
       <Route path={"/login"} component={Login} />
       <Route path={"/signup"} component={Signup} />
       <Route path={"/gallery"} component={Gallery} />
-      <Route path={"/dashboard"} component={Dashboard} />
-      <Route path={"/events"} component={Events} />
+      <Route path={"/dashboard"}>
+        <ProtectedRoute>
+          <Dashboard />
+        </ProtectedRoute>
+      </Route>
+      <Route path={"/events"}>
+        <ProtectedRoute>
+          <Events />
+        </ProtectedRoute>
+      </Route>
       <Route path={"/404"} component={NotFound} />
       {/* Final fallback route */}
       <Route component={NotFound} />

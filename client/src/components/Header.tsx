@@ -1,10 +1,19 @@
 import { Button } from "@/components/ui/button";
-import { Menu, X } from "lucide-react";
+import { Menu, X, LogOut } from "lucide-react";
 import { useState } from "react";
-import { Link } from "wouter";
+import { Link, useLocation } from "wouter";
+import { useAuth } from "@/contexts/AuthContext";
 
 export default function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const { user, signOut, loading } = useAuth();
+  const [, navigate] = useLocation();
+
+  const handleLogout = async () => {
+    await signOut();
+    navigate("/");
+    setMobileMenuOpen(false);
+  };
 
   return (
     <header className="sticky top-0 z-50 bg-white border-b border-gray-200">
@@ -39,12 +48,33 @@ export default function Header() {
 
           {/* Desktop Buttons */}
           <div className="hidden md:flex items-center gap-3">
-            <Button variant="ghost" className="text-black hover:bg-gray-100">
-              Entrar
-            </Button>
-            <Button className="bg-[#7FFF00] text-black hover:bg-[#6FEE00] font-semibold">
-              Criar Conta
-            </Button>
+            {user ? (
+              <>
+                <span className="text-sm text-gray-700">{user.email}</span>
+                <Button
+                  variant="ghost"
+                  className="text-black hover:bg-gray-100 flex items-center gap-2"
+                  onClick={handleLogout}
+                  disabled={loading}
+                >
+                  <LogOut size={16} />
+                  Sair
+                </Button>
+              </>
+            ) : (
+              <>
+                <Link href="/login">
+                  <Button variant="ghost" className="text-black hover:bg-gray-100">
+                    Entrar
+                  </Button>
+                </Link>
+                <Link href="/signup">
+                  <Button className="bg-[#7FFF00] text-black hover:bg-[#6FEE00] font-semibold">
+                    Criar Conta
+                  </Button>
+                </Link>
+              </>
+            )}
           </div>
 
           {/* Mobile Menu Button */}
@@ -73,12 +103,33 @@ export default function Header() {
               Como Funciona
             </a>
             <div className="flex flex-col gap-2 mt-2">
-              <Button variant="ghost" className="w-full text-black hover:bg-gray-100">
-                Entrar
-              </Button>
-              <Button className="w-full bg-[#7FFF00] text-black hover:bg-[#6FEE00] font-semibold">
-                Criar Conta
-              </Button>
+              {user ? (
+                <>
+                  <span className="text-sm text-gray-700 px-2">{user.email}</span>
+                  <Button
+                    variant="ghost"
+                    className="w-full text-black hover:bg-gray-100 flex items-center justify-center gap-2"
+                    onClick={handleLogout}
+                    disabled={loading}
+                  >
+                    <LogOut size={16} />
+                    Sair
+                  </Button>
+                </>
+              ) : (
+                <>
+                  <Link href="/login">
+                    <Button variant="ghost" className="w-full text-black hover:bg-gray-100">
+                      Entrar
+                    </Button>
+                  </Link>
+                  <Link href="/signup">
+                    <Button className="w-full bg-[#7FFF00] text-black hover:bg-[#6FEE00] font-semibold">
+                      Criar Conta
+                    </Button>
+                  </Link>
+                </>
+              )}
             </div>
           </nav>
         )}
