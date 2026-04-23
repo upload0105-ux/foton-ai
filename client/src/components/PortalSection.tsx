@@ -43,7 +43,7 @@ export default function PortalSection() {
               </li>
             </ul>
             <Button 
-              onClick={() => setLocation("/dashboard")}
+              onClick={() => setLocation("/login")}
               className="bg-[#7FFF00] text-black hover:bg-[#6FEE00] font-semibold text-lg px-8 py-6 flex items-center gap-2"
             >
               Vender Fotos <ArrowRight size={20} />
