@@ -28,10 +28,15 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Link } from "wouter";
+import { Link, useLocation } from "wouter";
 import { supabase } from "@/lib/supabase";
+import { useAuth } from "@/contexts/AuthContext";
+import { useProtectedRoute } from "@/hooks/useProtectedRoute";
 
 export default function Dashboard() {
+  const { user, loading: authLoading } = useProtectedRoute();
+  const { signOut } = useAuth();
+  const [, navigate] = useLocation();
   const [activeTab, setActiveTab] = useState("eventos");
   const [activeEventTab, setActiveEventTab] = useState("dados");
   const [showMarketingMenu, setShowMarketingMenu] = useState(false);
@@ -49,6 +54,26 @@ export default function Dashboard() {
   const [sales, setSales] = useState<any[]>([]);
   const [customers, setCustomers] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+
+  const handleLogout = async () => {
+    try {
+      await signOut();
+      navigate('/login');
+    } catch (error) {
+      console.error('Erro ao fazer logout:', error);
+    }
+  };
+
+  if (authLoading) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#7FFF00] mx-auto mb-4"></div>
+          <p className="text-gray-600">Carregando...</p>
+        </div>
+      </div>
+    );
+  }
 
   // Fetch data from Supabase
   useEffect(() => {
@@ -421,10 +446,13 @@ export default function Dashboard() {
           <div className="flex items-center gap-4">
             <button className="text-gray-400 hover:text-gray-600"><HelpCircle size={20} /></button>
             <button className="text-gray-400 hover:text-gray-600"><Bell size={20} /></button>
-            <div className="flex items-center gap-2 pl-4 border-l border-gray-100">
-              <div className="w-8 h-8 rounded-full bg-gray-100 text-gray-600 flex items-center justify-center text-xs font-bold border border-gray-200">AJ</div>
-              <span className="text-sm font-medium text-gray-700">AVANY</span>
-              <ChevronDown size={14} className="text-gray-400" />
+            <div className="flex items-center gap-4">
+              <div className="flex items-center gap-2 pl-4 border-l border-gray-100">
+                <div className="w-8 h-8 rounded-full bg-gray-100 text-gray-600 flex items-center justify-center text-xs font-bold border border-gray-200">{user?.email?.charAt(0).toUpperCase()}</div>
+                <span className="text-sm font-medium text-gray-700">{user?.email?.split('@')[0].toUpperCase()}</span>
+                <ChevronDown size={14} className="text-gray-400" />
+              </div>
+              <Button onClick={handleLogout} variant="outline" className="text-sm font-bold text-red-600 border-red-200 hover:bg-red-50">Sair</Button>
             </div>
           </div>
         </div>
